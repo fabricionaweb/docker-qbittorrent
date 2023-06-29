@@ -1,0 +1,87 @@
+From f98e071eef543e053cf4f8008a44b92ab7c0b463 Mon Sep 17 00:00:00 2001
+From: Fabricio Silva <hi@fabricio.dev>
+Date: Sat, 8 Jul 2023 08:47:26 +0100
+Subject: [PATCH] WebUI: Preserve the network interfaces when down
+
+https://github.com/qbittorrent/qBittorrent/pull/19286
+
+If the current network interface is down (eg: wg0) the endpoint used
+to construct the dropdown with available values for network interfaces
+will not return it.
+
+For this reason the value "Any interface" will be pre-selected, and by
+calling the Save (without the user change the network interfaces) it
+undesirable update the current network interface to "Any interface".
+
+This fix is to add the current interface to the dropdown when needed,
+this way the current network interface will be always present and
+selected.
+
+---
+ src/webui/api/appcontroller.cpp              |  7 +++++--
+ src/webui/www/private/views/preferences.html | 10 +++++++---
+ 2 files changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/src/webui/api/appcontroller.cpp b/src/webui/api/appcontroller.cpp
+index f7a723af8..ff1b4f50c 100644
+--- a/src/webui/api/appcontroller.cpp
++++ b/src/webui/api/appcontroller.cpp
+@@ -305,8 +305,10 @@
+     data[u"memory_working_set_limit"_qs] = app()->memoryWorkingSetLimit();
+     // Current network interface
+     data[u"current_network_interface"_qs] = session->networkInterface();
++    // Current network interface name
++    data[u"current_interface_name"_qs] = session->networkInterfaceName();
+     // Current network interface address
+-    data[u"current_interface_address"_qs] = BitTorrent::Session::instance()->networkInterfaceAddress();
++    data[u"current_interface_address"_qs] = session->networkInterfaceAddress();
+     // Save resume data interval
+     data[u"save_resume_data_interval"_qs] = session->saveResumeDataInterval();
+     // Recheck completed torrents
+@@ -797,7 +799,8 @@ void AppController::setPreferencesAction()
+         const QString ifaceName = (ifacesIter != ifaces.cend()) ? ifacesIter->humanReadableName() : QString {};
+
+         session->setNetworkInterface(ifaceValue);
+-        session->setNetworkInterfaceName(ifaceName);
++        if (!ifaceName.isEmpty() || ifaceValue.isEmpty())
++            session->setNetworkInterfaceName(ifaceName);
+     }
+     // Current network interface address
+     if (hasKey(u"current_interface_address"_qs))
+diff --git a/src/webui/www/private/views/preferences.html b/src/webui/www/private/views/preferences.html
+index 3c3634431..d59734259 100644
+--- a/src/webui/www/private/views/preferences.html
++++ b/src/webui/www/private/views/preferences.html
+@@ -1643,7 +1643,7 @@
+         };
+
+         // Advanced Tab
+-        const updateNetworkInterfaces = function(default_iface) {
++        const updateNetworkInterfaces = function(default_iface, default_iface_name) {
+             const url = 'api/v2/app/networkInterfaceList';
+             $('networkInterface').empty();
+             new Request.JSON({
+@@ -1654,9 +1654,13 @@
+                     alert("Could not contact qBittorrent");
+                 },
+                 onSuccess: function(ifaces) {
+-                    if (!ifaces)
++                    if (!Array.isArray(ifaces))
+                         return;
+
++                    // add the current network interface to the options if needed
++                    if (default_iface && !ifaces.some((item) => item.value === default_iface))
++                        ifaces.push({ name: default_iface_name || default_iface, value: default_iface });
++
+                     $('networkInterface').options.add(new Option('QBT_TR(Any interface)QBT_TR[CONTEXT=OptionsDialog]', ''));
+                     ifaces.forEach(function(item, index) {
+                         $('networkInterface').options.add(new Option(item.name, item.value));
+@@ -2039,7 +2043,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.)QBT_TR[CONTEXT=OptionsD
+                         // qBittorrent section
+                         $('resumeDataStorageType').setProperty('value', pref.resume_data_storage_type);
+                         $('memoryWorkingSetLimit').setProperty('value', pref.memory_working_set_limit);
+-                        updateNetworkInterfaces(pref.current_network_interface);
++                        updateNetworkInterfaces(pref.current_network_interface, pref.current_interface_name);
+                         updateInterfaceAddresses(pref.current_network_interface, pref.current_interface_address);
+                         $('saveResumeDataInterval').setProperty('value', pref.save_resume_data_interval);
+                         $('recheckTorrentsOnCompletion').setProperty('checked', pref.recheck_completed_torrents);
