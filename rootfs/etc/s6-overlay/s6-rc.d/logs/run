@@ -1,0 +1,4 @@
+#!/usr/bin/execlineb -P
+
+# listen for logs
+tail -F -n0 /config/qBittorrent/data/logs/qbittorrent.log

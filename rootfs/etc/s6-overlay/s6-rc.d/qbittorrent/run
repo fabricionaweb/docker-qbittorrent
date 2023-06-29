@@ -1,0 +1,26 @@
+#!/usr/bin/with-contenv sh
+
+CONFIG_FILE=/config/qBittorrent/config/qBittorrent.conf
+
+# create initial config file
+if [[ ! -f "$CONFIG_FILE" ]]; then
+  mkdir -p $(dirname "$CONFIG_FILE")
+  cat <<EOF >"$CONFIG_FILE"
+[BitTorrent]
+Session\Interface=wg0
+
+[Preferences]
+WebUI\HostHeaderValidation=false
+WebUI\UseUPnP=false
+WebUI\LocalHostAuth=false
+EOF
+elif [[ $(grep -c "Session\\\Interface" "$CONFIG_FILE") == 0 ]]; then
+  # if interface doenst exist in config, insert one
+  sed -i "/\[BitTorrent\]/a Session\\\Interface=wg0" "$CONFIG_FILE"
+else
+  # replace interface
+  sed -i "s/Session\\\Interface=.*/Session\\\Interface=wg0/" "$CONFIG_FILE"
+fi
+
+# run with limited permissions
+exec s6-setuidgid $PUID:$PGID /app/qbittorrent-nox --profile=/config

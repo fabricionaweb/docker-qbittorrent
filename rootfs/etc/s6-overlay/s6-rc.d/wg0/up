@@ -1,0 +1,4 @@
+#!/usr/bin/execlineb -P
+
+# start the vpn
+wg-quick up /config/wg0.conf
