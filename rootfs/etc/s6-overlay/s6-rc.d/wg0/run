@@ -1,0 +1,11 @@
+#!/usr/bin/with-contenv sh
+
+CONFIG_FILE=/config/wg0.conf
+
+# comment DNS sections from wg0.conf
+sed -i 's/^[^#]*DNS/#&/' "$CONFIG_FILE"
+# comment Pre/Post hooks from wg0.conf
+# sed -i -E 's/^[^#]*(Pre|Post)(Up|Down)/#&/' "$CONFIG_FILE"
+
+# start wireguard
+exec wg-quick up "$CONFIG_FILE"

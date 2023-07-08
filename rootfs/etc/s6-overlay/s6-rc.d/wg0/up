@@ -1,4 +1,5 @@
 #!/usr/bin/execlineb -P
 
-# start the vpn
-wg-quick up /config/wg0.conf
+# up/downs script only runs execlineb (it only runs one line)
+# needs to run as external script
+/etc/s6-overlay/s6-rc.d/wg0/run
