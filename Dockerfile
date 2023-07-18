@@ -10,11 +10,11 @@ ARG VERSION
 # mandatory build-arg
 RUN test -n "$VERSION"
 
-# dependencies
-RUN apk add --no-cache patch
-
 # get and extract source from git
 ADD https://github.com/qbittorrent/qBittorrent.git#release-$VERSION ./
+
+# dependencies
+RUN apk add --no-cache patch
 
 # apply available patches
 COPY patches ./
@@ -47,12 +47,12 @@ WORKDIR /config
 VOLUME /config
 EXPOSE 8080
 
-# runtime dependencies
-RUN apk add --no-cache tzdata s6-overlay libtorrent-rasterbar qt6-qtbase-sqlite wireguard-tools curl
-
 # copy files
 COPY --from=build /build/qbittorrent-nox /app/qbittorrent-nox
 COPY ./rootfs /
+
+# runtime dependencies
+RUN apk add --no-cache tzdata s6-overlay libtorrent-rasterbar qt6-qtbase-sqlite wireguard-tools curl
 
 # run using s6-overlay
 ENTRYPOINT ["/init"]
