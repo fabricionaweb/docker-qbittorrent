@@ -28,9 +28,6 @@ RUN apk add --no-cache boost-dev build-base cmake libtorrent-rasterbar-dev samur
         qt6-qtbase-dev qt6-qtsvg-dev qt6-qttools-dev
 
 # build
-ENV CFLAGS="-pipe -fstack-clash-protection -fstack-protector-strong -fno-plt -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3"
-ENV CXXFLAGS="$CFLAGS -D_GLIBCXX_ASSERTIONS"
-ENV LDFLAGS="-gz -Wl,-O1,--as-needed,--sort-common,-z,now,-z,relro"
 RUN cmake -B /build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/usr \
