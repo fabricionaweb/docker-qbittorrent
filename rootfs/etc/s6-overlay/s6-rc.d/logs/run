@@ -1,4 +1,14 @@
-#!/usr/bin/execlineb -P
+#!/usr/bin/with-contenv sh
+
+LOG_FILE=/config/qBittorrent/data/logs/qbittorrent.log
+
+# create initial log file
+if [[ ! -f "$LOG_FILE" ]]; then
+  mkdir -p $(dirname "$LOG_FILE")
+  touch "$LOG_FILE"
+  # not a good practice but I cant think anything better
+  chown -R $PUID:$PGID /config
+fi
 
 # listen for logs
-tail -F -n0 /config/qBittorrent/data/logs/qbittorrent.log
+exec tail -F -n0 "$LOG_FILE"

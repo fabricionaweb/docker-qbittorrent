@@ -14,6 +14,8 @@ WebUI\HostHeaderValidation=false
 WebUI\UseUPnP=false
 WebUI\LocalHostAuth=false
 EOF
+  # not a good practice but I cant think anything better
+  chown -R $PUID:$PGID /config
 elif [[ $(grep -c "Session\\\Interface" "$CONFIG_FILE") == 0 ]]; then
   # if interface doenst exist in config, insert one
   sed -i "/\[BitTorrent\]/a Session\\\Interface=wg0" "$CONFIG_FILE"
