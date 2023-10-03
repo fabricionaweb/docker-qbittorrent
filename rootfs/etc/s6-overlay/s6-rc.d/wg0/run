@@ -7,6 +7,15 @@ if [[ -f "$CONFIG_FILE" ]]; then
   sed -i 's/^[^#]*DNS/#&/' "$CONFIG_FILE"
   # comment Pre/Post hooks from wg0.conf
   # sed -i -E 's/^[^#]*(Pre|Post)(Up|Down)/#&/' "$CONFIG_FILE"
+  # fix permission warning
+  chmod 600 "$CONFIG_FILE"
+fi
+
+# patch to net.ipv4.conf.all.src_valid_mark
+# source: https://lists.zx2c4.com/pipermail/wireguard/2023-February/007936.html
+if [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) == 1 ]]; then
+  # comment the line if already set
+  sed -i '/cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1/s/^/#/' /usr/bin/wg-quick
 fi
 
 # start wireguard
