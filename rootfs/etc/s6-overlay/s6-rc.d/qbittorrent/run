@@ -24,5 +24,8 @@ else
   sed -i "s/Session\\\Interface=.*/Session\\\Interface=wg0/" "$CONFIG_FILE"
 fi
 
+# change chdir
+cd /config
+
 # run with limited permissions
 exec s6-setuidgid $PUID:$PGID /app/qbittorrent-nox --profile=/config
