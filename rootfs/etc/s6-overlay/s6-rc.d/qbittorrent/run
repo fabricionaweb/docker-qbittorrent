@@ -21,7 +21,7 @@ elif [[ $(grep -c "Session\\\Interface" "$CONFIG_FILE") == 0 ]]; then
   sed -i "/\[BitTorrent\]/a Session\\\Interface=wg0" "$CONFIG_FILE"
 else
   # replace interface
-  sed -i "s/Session\\\Interface=.*/Session\\\Interface=wg0/" "$CONFIG_FILE"
+  sed -i "/Session\\\Interface=.*/s/=.*/=wg0/" "$CONFIG_FILE"
 fi
 
 # change chdir
