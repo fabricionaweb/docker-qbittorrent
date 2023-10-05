@@ -45,7 +45,7 @@ VOLUME /config
 EXPOSE 8080
 
 # copy files
-COPY --from=build /build/qbittorrent-nox /app/qbittorrent-nox
+COPY --from=build /build/qbittorrent-nox /app/
 COPY ./rootfs /
 
 # runtime dependencies
