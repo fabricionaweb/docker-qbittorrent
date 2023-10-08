@@ -19,13 +19,18 @@ COPY patches ./
 RUN find . -name "*.patch" -print0 | sort -z | xargs -t -0 -n1 patch -p1 -i
 
 # build stage ==================================================================
-FROM source AS build
+FROM base AS build
+WORKDIR /src
 
 # build dependencies
 RUN apk add --no-cache boost-dev build-base cmake libtorrent-rasterbar-dev \
         samurai qt6-qtbase-dev qt6-qtsvg-dev qt6-qttools-dev
 
-# build
+# source and build
+COPY --from=source /src/cmake ./cmake
+COPY --from=source /src/dist ./dist
+COPY --from=source /src/src ./src
+COPY --from=source /src/CMakeLists.txt ./
 RUN cmake -B /build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/usr \
