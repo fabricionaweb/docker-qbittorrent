@@ -11,15 +11,14 @@ Just another qBittorrent image. But compiled from the source.
 **Suggested setup using PostUp/PreDown hooks**
 
 1. Set your `LAN_CIDR` with docker environments eg: `10.0.0.0/24` or `192.168.0.0/24`
-1. `BR_GATEWAY`, `BR_DEV`, `BR_CIDR` are exported by the [service](./rootfs/etc/s6-overlay/s6-rc.d/wg0/run)
+1. `BR_GATEWAY`, `BR_DEV`, `BR_CIDR` are exported loaded into [.profile](./rootfs/root/.profile)
 1. Add or replace **PostUp** and **PreDown** on your `/config/wg0.conf`
 
    ```
    # LAN_CIDR comes from docker env
    PostUp  = ip route add $LAN_CIDR via $BR_GATEWAY dev $BR_DEV
-   PreDown = ip route del $LAN_CIDR
    PostUp  = iptables -I OUTPUT ! -d $LAN_CIDR ! -o %i -m mark ! --mark $(wg show %i fwmark) -m addrtype ! --dst-type LOCAL -j REJECT
-   PreDown = iptables -D OUTPUT ! -d $LAN_CIDR ! -o %i -m mark ! --mark $(wg show %i fwmark) -m addrtype ! --dst-type LOCAL -j REJECT
    PostUp  = iptables -I OUTPUT -s $BR_CIDR -d $BR_CIDR -j ACCEPT
-   PreDown = iptables -D OUTPUT -s $BR_CIDR -d $BR_CIDR -j ACCEPT
+   PreDown = ip route del $LAN_CIDR
+   PreDown = iptables -F OUTPUT
    ```

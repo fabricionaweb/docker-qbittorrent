@@ -18,11 +18,8 @@ if [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) == 1 ]]; then
   sed -i '/cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1/s/^/#/' /usr/bin/wg-quick
 fi
 
-# export useful variables
-dockernet=$(ip route show default)
-export BR_DEV=$(echo $dockernet | awk '{print $5}')
-export BR_GATEWAY=$(echo $dockernet | awk '{print $3}')
-export BR_CIDR=$(ip -o addr show $BR_DEV | awk '{print $4}')
+# load network variables
+source /root/.profile
 
 # start wireguard
 exec wg-quick up "$CONFIG_FILE"
