@@ -11,7 +11,7 @@ Just another qBittorrent image. But compiled from the source.
 **Suggested setup using PostUp/PreDown hooks**
 
 1. Set your `LAN_CIDR` with docker environments eg: `10.0.0.0/24` or `192.168.0.0/24`
-1. `BR_GATEWAY`, `BR_DEV`, `BR_CIDR` are exported loaded into [.profile](./rootfs/root/.profile)
+1. `BR_GATEWAY`, `BR_DEV`, `BR_CIDR` are exported from [.profile](./rootfs/root/.profile) and should be available on interative shell, otherwise needs to load `source /root/.profile`
 1. Add or replace **PostUp** and **PreDown** on your `/config/wg0.conf`
 
    ```
