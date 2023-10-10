@@ -20,7 +20,7 @@ FROM base AS build
 WORKDIR /src
 
 # build dependencies
-RUN apk add --no-cache boost-dev build-base cmake libtorrent-rasterbar-dev \
+RUN apk add --no-cache build-base cmake libtorrent-rasterbar-dev \
         samurai qt6-qtbase-dev qt6-qtsvg-dev qt6-qttools-dev
 
 # source and build
@@ -34,7 +34,8 @@ RUN cmake -B /build -G Ninja \
         -DSTACKTRACE=OFF \
         -DGUI=OFF \
         -DQT6=ON && \
-    cmake --build /build
+    cmake --build /build && \
+    strip /build/qbittorrent-nox
 
 # runtime stage ================================================================
 FROM base
