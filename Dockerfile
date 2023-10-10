@@ -52,7 +52,7 @@ RUN apk add --no-cache tzdata s6-overlay libtorrent-rasterbar \
 
 # copy files
 COPY --from=build /build/qbittorrent-nox /app/
-COPY ./rootfs /
+COPY ./rootfs/. /
 
 # run using s6-overlay
 ENTRYPOINT ["/init"]
