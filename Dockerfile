@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1-labs
 FROM public.ecr.aws/docker/library/alpine:3.18 AS base
 ENV TZ=UTC
+WORKDIR /src
 
 # source stage =================================================================
 FROM base AS source
-WORKDIR /src
 
 # get and extract source from git
 ARG VERSION
@@ -13,11 +13,10 @@ ADD https://github.com/qbittorrent/qBittorrent.git#release-$VERSION ./
 # apply available patches
 RUN apk add --no-cache patch
 COPY patches ./
-RUN find . -name "*.patch" -print0 | sort -z | xargs -t -0 -n1 patch -p1 -i
+RUN find ./ -name "*.patch" -print0 | sort -z | xargs -t -0 -n1 patch -p1 -i
 
 # build stage ==================================================================
 FROM base AS build
-WORKDIR /src
 
 # build dependencies
 RUN apk add --no-cache build-base cmake libtorrent-rasterbar-dev \
