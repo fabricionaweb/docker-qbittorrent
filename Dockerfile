@@ -22,7 +22,7 @@ FROM base AS build
 RUN apk add --no-cache build-base cmake libtorrent-rasterbar-dev \
         samurai qt6-qtbase-dev qt6-qtsvg-dev qt6-qttools-dev
 
-# source and build
+# build app
 COPY --from=source /src/cmake ./cmake
 COPY --from=source /src/dist ./dist
 COPY --from=source /src/src ./src
