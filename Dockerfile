@@ -45,13 +45,13 @@ WORKDIR /config
 VOLUME /config
 EXPOSE 8080
 
-# runtime dependencies
-RUN apk add --no-cache tzdata s6-overlay libtorrent-rasterbar \
-        qt6-qtbase-sqlite wireguard-tools curl
-
 # copy files
 COPY --from=build /build/qbittorrent-nox /app/
 COPY ./rootfs/. /
+
+# runtime dependencies
+RUN apk add --no-cache tzdata s6-overlay libtorrent-rasterbar \
+        qt6-qtbase-sqlite wireguard-tools curl
 
 # run using s6-overlay
 ENTRYPOINT ["/init"]
