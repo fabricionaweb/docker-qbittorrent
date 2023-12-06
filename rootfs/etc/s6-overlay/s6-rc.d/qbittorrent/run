@@ -1,30 +1,48 @@
 #!/usr/bin/with-contenv sh
 
+# load network variables
+source /root/.profile
+
 CONFIG_FILE=/config/qBittorrent/config/qBittorrent.conf
+LAN_IP="${BR_CIDR%/*}"
+DEV_WG="wg0"
 
 # create initial config file
 if [[ ! -f "$CONFIG_FILE" ]]; then
   TMP_FILE="/tmp/$0.$$.$RANDOM"
   cat <<EOF >"$TMP_FILE"
 [BitTorrent]
-Session\Interface=wg0
+Session\Interface=$DEV_WG
 
 [Preferences]
 WebUI\HostHeaderValidation=false
 WebUI\UseUPnP=false
 WebUI\LocalHostAuth=false
+WebUI\Address=$LAN_IP
 EOF
 
   install -dm755 -o $PUID -g $PGID \
-    /config/qBittorrent \
-    /config/qBittorrent/config
+    /config/qBittorrent /config/qBittorrent/config
   install -m644  -o $PUID -g $PGID "$TMP_FILE" "$CONFIG_FILE"
-elif [[ $(grep -c "Session\\\Interface" "$CONFIG_FILE") == 0 ]]; then
-  # if interface doenst exist in config, insert one
-  sed -i "/\[BitTorrent\]/a Session\\\Interface=wg0" "$CONFIG_FILE"
 else
-  # replace interface
-  sed -i "/Session\\\Interface=.*/s/=.*/=wg0/" "$CONFIG_FILE"
+  # from here bellow assume conf is valid
+  # [BitTorrent] and [Preferences] keys needs to exists
+
+  # interface doenst exist in config, insert one
+  if [[ $(grep -c "Session\\\Interface" "$CONFIG_FILE") == 0 ]]; then
+    sed -i "/\[BitTorrent\]/a Session\\\Interface=$DEV_WG" "$CONFIG_FILE"
+  else
+    # replace interface
+    sed -i "/Session\\\Interface=.*/s/=.*/=$DEV_WG/" "$CONFIG_FILE"
+  fi
+
+  # webUI doesnt exist in config, insert one
+  if [[ $(grep -c "WebUI\\\Address" "$CONFIG_FILE") == 0 ]]; then
+    sed -i "/\[Preferences\]/a WebUI\\\Address=$LAN_IP" "$CONFIG_FILE"
+  else
+    # bind webui to lan
+    sed -i "/WebUI\\\Address=.*/s,=.*,=$LAN_IP," "$CONFIG_FILE"
+  fi
 fi
 
 # change chdir

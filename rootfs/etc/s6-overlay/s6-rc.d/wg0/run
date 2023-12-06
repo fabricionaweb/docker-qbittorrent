@@ -1,5 +1,8 @@
 #!/usr/bin/with-contenv sh
 
+# load network variables
+source /root/.profile
+
 CONFIG_FILE=/config/wg0.conf
 
 if [[ -f "$CONFIG_FILE" ]]; then
@@ -17,9 +20,6 @@ if [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) == 1 ]]; then
   # comment the line if already set
   sed -i '/cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1/s/^/#/' /usr/bin/wg-quick
 fi
-
-# load network variables
-source /root/.profile
 
 # start wireguard
 exec wg-quick up "$CONFIG_FILE"
