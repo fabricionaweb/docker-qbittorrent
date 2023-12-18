@@ -51,7 +51,7 @@ COPY ./rootfs/. /
 
 # runtime dependencies
 RUN apk add --no-cache tzdata s6-overlay libtorrent-rasterbar \
-        qt6-qtbase-sqlite wireguard-tools curl
+        qt6-qtbase-sqlite iptables wireguard-tools curl
 
 # run using s6-overlay
 ENTRYPOINT ["/init"]
