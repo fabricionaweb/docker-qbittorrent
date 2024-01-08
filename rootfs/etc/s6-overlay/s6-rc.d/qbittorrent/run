@@ -4,15 +4,13 @@
 source /root/.profile
 
 CONFIG_FILE=/config/qBittorrent/config/qBittorrent.conf
-LAN_IP="${BR_CIDR%/*}"
-DEV_WG="wg0"
 
 # create initial config file
 if [[ ! -f "$CONFIG_FILE" ]]; then
   TMP_FILE="/tmp/$0.$$.$RANDOM"
   cat <<EOF >"$TMP_FILE"
 [BitTorrent]
-Session\Interface=$DEV_WG
+Session\Interface=$WG_DEV
 
 [Preferences]
 WebUI\HostHeaderValidation=false
@@ -30,10 +28,10 @@ else
 
   # interface doenst exist in config, insert one
   if [[ $(grep -c "Session\\\Interface" "$CONFIG_FILE") == 0 ]]; then
-    sed -i "/\[BitTorrent\]/a Session\\\Interface=$DEV_WG" "$CONFIG_FILE"
+    sed -i "/\[BitTorrent\]/a Session\\\Interface=$WG_DEV" "$CONFIG_FILE"
   else
     # replace interface
-    sed -i "/Session\\\Interface=.*/s/=.*/=$DEV_WG/" "$CONFIG_FILE"
+    sed -i "/Session\\\Interface=.*/s/=.*/=$WG_DEV/" "$CONFIG_FILE"
   fi
 
   # webUI doesnt exist in config, insert one
