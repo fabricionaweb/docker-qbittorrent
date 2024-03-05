@@ -2,6 +2,10 @@ Just another qBittorrent image. But compiled from the source.
 
 ---
 
+**Environments**
+
+- `DISABLE_VPN` set it to disable VPN
+
 **Needed docker arguments**
 
 - `--cap-add=NET_ADMIN`
