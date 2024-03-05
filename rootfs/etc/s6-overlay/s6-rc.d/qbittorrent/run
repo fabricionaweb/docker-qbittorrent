@@ -27,12 +27,12 @@ else
   # [BitTorrent] and [Preferences] keys needs to exists
 
   # interface doenst exist in config, insert one
-  if [[ $(grep -c "Session\\\Interface" "$CONFIG_FILE") == 0 ]]; then
-    sed -i "/\[BitTorrent\]/a Session\\\Interface=$WG_DEV" "$CONFIG_FILE"
-  else
-    # replace interface
-    sed -i "/Session\\\Interface=.*/s/=.*/=$WG_DEV/" "$CONFIG_FILE"
-  fi
+#   if [[ $(grep -c "Session\\\Interface" "$CONFIG_FILE") == 0 ]]; then
+#     sed -i "/\[BitTorrent\]/a Session\\\Interface=$WG_DEV" "$CONFIG_FILE"
+#   else
+#     # replace interface
+#     sed -i "/Session\\\Interface=.*/s/=.*/=$WG_DEV/" "$CONFIG_FILE"
+#   fi
 
   # webUI doesnt exist in config, insert one
   if [[ $(grep -c "WebUI\\\Address" "$CONFIG_FILE") == 0 ]]; then
