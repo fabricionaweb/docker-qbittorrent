@@ -7,7 +7,7 @@ CONFIG_FILE=/config/qBittorrent/config/qBittorrent.conf
 
 # create initial config file
 if [[ ! -f "$CONFIG_FILE" ]]; then
-  TMP_FILE="/tmp/$0.$$.$RANDOM"
+  TMP_FILE="$(mktemp)"
   cat <<EOF >"$TMP_FILE"
 [BitTorrent]
 Session\Interface=$WG_DEV
@@ -19,20 +19,21 @@ WebUI\LocalHostAuth=false
 WebUI\Address=$LAN_IP
 EOF
 
-  install -dm755 -o $PUID -g $PGID \
-    /config/qBittorrent /config/qBittorrent/config
+  install -dm755 -o $PUID -g $PGID /config/qBittorrent /config/qBittorrent/config
   install -m644  -o $PUID -g $PGID "$TMP_FILE" "$CONFIG_FILE"
 else
   # from here bellow assume conf is valid
   # [BitTorrent] and [Preferences] keys needs to exists
 
   # interface doenst exist in config, insert one
-#   if [[ $(grep -c "Session\\\Interface" "$CONFIG_FILE") == 0 ]]; then
-#     sed -i "/\[BitTorrent\]/a Session\\\Interface=$WG_DEV" "$CONFIG_FILE"
-#   else
-#     # replace interface
-#     sed -i "/Session\\\Interface=.*/s/=.*/=$WG_DEV/" "$CONFIG_FILE"
-#   fi
+  if [[ -z "$DISABLE_VPN" ]]; then
+    if [[ $(grep -c "Session\\\Interface" "$CONFIG_FILE") == 0 ]]; then
+      sed -i "/\[BitTorrent\]/a Session\\\Interface=$WG_DEV" "$CONFIG_FILE"
+    else
+      # replace interface
+      sed -i "/Session\\\Interface=.*/s/=.*/=$WG_DEV/" "$CONFIG_FILE"
+    fi
+  fi
 
   # webUI doesnt exist in config, insert one
   if [[ $(grep -c "WebUI\\\Address" "$CONFIG_FILE") == 0 ]]; then
