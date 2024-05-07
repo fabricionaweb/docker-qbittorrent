@@ -10,11 +10,6 @@ FROM base AS source
 ARG VERSION
 ADD https://github.com/qbittorrent/qBittorrent.git#release-$VERSION ./
 
-# apply available patches
-# RUN apk add --no-cache patch
-# COPY patches ./
-# RUN find ./ -name "*.patch" -print0 | sort -z | xargs -t -0 -n1 patch -p1 -i
-
 # build libtorrent =============================================================
 FROM base AS build-libtorrent
 
@@ -27,12 +22,13 @@ ARG LIBTORRENT_VERSION=1.2.19
 ADD https://github.com/arvidn/libtorrent.git#v$LIBTORRENT_VERSION ./
 
 # build libtorrent
+ENV DESTDIR=/build
 RUN cmake -B /build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DCMAKE_CXX_STANDARD=17 && \
     cmake --build /build && \
-    DESTDIR=/build/rootfs cmake --install /build
+    cmake --install /build
 
 # build stage ==================================================================
 FROM base AS build
@@ -42,7 +38,7 @@ RUN apk add --no-cache build-base cmake samurai boost-dev openssl-dev \
     qt6-qtbase-dev qt6-qtsvg-dev qt6-qttools-dev
 
 # build app
-COPY --from=build-libtorrent /build/rootfs/. /
+COPY --from=build-libtorrent /build/. /
 COPY --from=source /src/cmake ./cmake
 COPY --from=source /src/dist ./dist
 COPY --from=source /src/src ./src
@@ -66,7 +62,7 @@ VOLUME /config
 EXPOSE 8080
 
 # copy files
-COPY --from=build-libtorrent /build/rootfs/usr/lib/. /usr/lib/
+COPY --from=build-libtorrent /build/usr/lib/. /usr/lib/
 COPY --from=build /build/qbittorrent-nox /app/
 COPY ./rootfs/. /
 

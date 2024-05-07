@@ -25,7 +25,7 @@ else
   # from here bellow assume conf is valid
   # [BitTorrent] and [Preferences] keys needs to exists
 
-  # interface doenst exist in config, insert one
+  # interface doenst exist in config, insert one (VPN only)
   if [[ -z "$DISABLE_VPN" ]]; then
     if [[ $(grep -c "Session\\\Interface" "$CONFIG_FILE") == 0 ]]; then
       sed -i "/\[BitTorrent\]/a Session\\\Interface=$WG_DEV" "$CONFIG_FILE"
@@ -33,14 +33,14 @@ else
       # replace interface
       sed -i "/Session\\\Interface=.*/s/=.*/=$WG_DEV/" "$CONFIG_FILE"
     fi
-  fi
 
-  # webUI doesnt exist in config, insert one
-  if [[ $(grep -c "WebUI\\\Address" "$CONFIG_FILE") == 0 ]]; then
-    sed -i "/\[Preferences\]/a WebUI\\\Address=$LAN_IP" "$CONFIG_FILE"
-  else
-    # bind webui to lan
-    sed -i "/WebUI\\\Address=.*/s,=.*,=$LAN_IP," "$CONFIG_FILE"
+    # webUI doesnt exist in config, insert one
+    if [[ $(grep -c "WebUI\\\Address" "$CONFIG_FILE") == 0 ]]; then
+      sed -i "/\[Preferences\]/a WebUI\\\Address=$LAN_IP" "$CONFIG_FILE"
+    else
+      # bind webui to lan
+      sed -i "/WebUI\\\Address=.*/s,=.*,=$LAN_IP," "$CONFIG_FILE"
+    fi
   fi
 fi
 
