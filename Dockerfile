@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1-labs
-FROM public.ecr.aws/docker/library/alpine:3.20 AS base
+FROM public.ecr.aws/docker/library/alpine:3.21 AS base
 ENV TZ=UTC
 WORKDIR /src
 
@@ -47,8 +47,7 @@ RUN cmake -B /build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DSTACKTRACE=OFF \
-        -DGUI=OFF \
-        -DQT6=ON && \
+        -DGUI=OFF && \
     cmake --build /build && \
     strip /build/qbittorrent-nox
 
