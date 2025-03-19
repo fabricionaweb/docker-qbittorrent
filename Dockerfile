@@ -8,7 +8,8 @@ FROM base AS source
 
 # get and extract source from git
 ARG VERSION
-ADD https://github.com/qbittorrent/qBittorrent.git#release-$VERSION ./
+ADD https://github.com/qbittorrent/qBittorrent/archive/refs/tags/release-$VERSION.tar.gz /tmp/source.tgz
+RUN tar --strip-components=1 -xf /tmp/source.tgz
 
 # build libtorrent =============================================================
 FROM base AS build-libtorrent
@@ -19,7 +20,8 @@ RUN apk add --no-cache build-base cmake samurai boost-dev openssl-dev \
 
 # get and extract source from git
 ARG LIBTORRENT_VERSION=1.2.19
-ADD https://github.com/arvidn/libtorrent.git#v$LIBTORRENT_VERSION ./
+ADD https://github.com/arvidn/libtorrent/releases/download/v$LIBTORRENT_VERSION/libtorrent-rasterbar-$LIBTORRENT_VERSION.tar.gz /tmp/source.tgz
+RUN tar --strip-components=1 -xf /tmp/source.tgz
 
 # build libtorrent
 ENV DESTDIR=/build
